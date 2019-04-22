@@ -1,0 +1,32 @@
+client端: // 注意与同步的client区别
+initialization: {	
+ip, port  // 该client连接的server的ip和port，同一个client包含多个线程，每个线程代表一个worker，这些worker同步更新该server
+learning rate // 暂时的方案是固定不变，后续要考虑batch size与learning rate之间存在的线性关系
+sample size // 暂时的方案是固定，不过要衡量是每一个sample计算一个梯度还是整个batch计算一次梯度
+local iteration // 本地迭代次数，先固定一个值，不过要做实验证明不能迭代到本地收敛了再上传参数
+global iteration // 直到收敛，如何判定收敛时需要的全局迭代次数？
+}
+
+repeat until convergence { // global iteration
+	
+	local iteration { // model average
+		choose a batch randomly   
+		calculate gradient
+		update parameter with learning rate and gradient 
+	}
+	
+	store train loss, error, sample size, learning rate, local iteration, local train duration
+	
+	(同步client发送给server的是w，server根据每个client的w求和再平均；异步client发送给server的是梯度，server根据自己此时的w和learning rate更新w)
+	package message to send // 封装要发送的消息，这里要注意两个：一是消息的格式要定义好，要能灵活适用不同大小的数据包；二是考虑是否需要压缩发送 
+	
+	socket client connect server, send message to server, wait to receive message from server. // 是否在本地提交一次消息之后断开连接
+	
+	parse the received message, update parameter // 更新tensorflow的参数w，sample size，local iteration 
+	
+}
+
+## 如果在一个.py中采用多线程模拟多个worker训练，要保证每个线程在本地一次迭代中不冲突。也可以考虑多进程。
+
+
+

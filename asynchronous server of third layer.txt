@@ -1,0 +1,19 @@
+asynchronous server of third layer: 
+initialization: {
+ip, port // server的ip和port
+w, b         // 模型参数，全局变量
+}
+
+while True: {
+	listen server address(ip_1, port_1)
+	
+	start a new thread: // 当有一个client(第二层的server)连接server时，开启一个新的线程处理这个client与server的消息
+		parse the received message, get the gradient // socket 循环接受消息时需不需要加锁？？？
+		update w,b with gradient and learning rate // 由于w,b是全局变量，更新过程需要加锁
+		calculate test error with test data and updated w,b
+		store test error        // 暂时先只存测试误差
+		package message to send // 暂时只有w和b
+		
+}
+
+## 对于纯异步和纯同步算法，三层的结构与两层的结构没有差异，只在socket中“浪费时间”，因此可以用两层的替代做实验
