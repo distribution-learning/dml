@@ -1,0 +1,4 @@
+client <-----> server-1 server-2: 1
+server <-----> server-1 server-2: 0
+{direction_flag: , w: , b: , acc: , loss: , sample_size_local, local_epoch: , local_duration: }
+
